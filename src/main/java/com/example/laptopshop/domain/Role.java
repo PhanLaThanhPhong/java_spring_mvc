@@ -16,13 +16,13 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String name; // Admin,User
+    private String name;
     private String description;
     
     @OneToMany(mappedBy = "role")
     private List<User> users;
 
-
+    
     public long getId() {
         return id;
     }
