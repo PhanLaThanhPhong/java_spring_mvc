@@ -1,20 +1,18 @@
 package com.example.laptopshop.controller.admin;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import com.example.laptopshop.service.UploadService;
 import com.example.laptopshop.service.UserService;
 
-import jakarta.servlet.ServletContext;
+import jakarta.validation.Valid;
 
 import com.example.laptopshop.domain.Role;
 import com.example.laptopshop.domain.User;
@@ -39,13 +37,13 @@ public class UserController {
     }
 
     // url mapping to home page
-    @GetMapping("/")
-    public String getHomePage(Model model) {
-        List<User> listUser = this.userService.getAllUsers();
-        System.out.println(listUser);
-        model.addAttribute("test", "test");
-        return "home";
-    }
+    // @GetMapping("/")
+    // public String getHomePage(Model model) {
+    // List<User> listUser = this.userService.getAllUsers();
+    // System.out.println(listUser);
+    // model.addAttribute("test", "test");
+    // return "home";
+    // }
 
     // url mapping to table user page
     @GetMapping("/admin/user")
@@ -73,14 +71,25 @@ public class UserController {
     // url mapping to action create user
     @PostMapping("/admin/user/create")
     public String createUserPage(Model model,
-            @ModelAttribute("newUser") User user,
+            @ModelAttribute("newUser") @Valid User user,
+            BindingResult newUserBindingResult,
             @RequestParam("file") MultipartFile file) {
+        // Lấy ra list danh sách lỗi
+        List<FieldError> errors = newUserBindingResult.getFieldErrors();
+        for (FieldError error : errors) {
+            System.out.println(error.getField() + " - " + error.getDefaultMessage());
+        }
+        // validate dữ liệu
+        if (newUserBindingResult.hasErrors()) {
+            return "admin/user/create";
+        }
         String avatar = this.uploadService.handleSaveUploadFile(file, "avatar");
         String hashPassword = this.passwordEncoder.encode(user.getPassword());
-        Role role = this.userService.getRoleByName(user.getRole().getName()); 
+        Role role = this.userService.getRoleByName(user.getRole().getName());
         user.setAvatar(avatar);
         user.setPassword(hashPassword);
         user.setRole(role);
+        // save người dùng vào db
         this.userService.handleSaveUser(user);
         return "redirect:/admin/user";
     }
@@ -95,9 +104,22 @@ public class UserController {
 
     // url mapping to action update user
     @PostMapping("/admin/user/update")
-    public String updateUserPage(Model model, @ModelAttribute("newUser") User user) {
+    public String updateUserPage(Model model,
+            @ModelAttribute("newUser") @Valid User user,
+            BindingResult newUserBindingResult) {
+        List<FieldError> errors = newUserBindingResult.getFieldErrors();
+        for (FieldError error : errors) {
+            System.out.println(error.getField() + " - " + error.getDefaultMessage());
+        }
         User currentUser = this.userService.getUserById(user.getId()).get();
+        long id = user.getId();
+        // validate dữ liệu
+        if (newUserBindingResult.hasErrors()) {
+            return "redirect:/admin/user/update/" + id;
+        }
+        
         if (currentUser != null) {
+            currentUser.setEmail(user.getEmail());
             currentUser.setAddress(user.getAddress());
             currentUser.setFullName(user.getFullName());
             currentUser.setPhone(user.getPhone());
@@ -114,7 +136,7 @@ public class UserController {
     }
 
     @PostMapping("/admin/user/delete")
-    public String postMethodName(Model model, @ModelAttribute("newUser") User user) {
+    public String deleteUserPage(Model model, @ModelAttribute("newUser") User user) {
         this.userService.deleteAUser(user.getId());
         return "redirect:/admin/user";
     }
