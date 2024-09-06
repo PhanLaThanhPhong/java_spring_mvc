@@ -3,6 +3,8 @@ package com.example.laptopshop.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.laptopshop.domain.Role;
@@ -28,7 +30,7 @@ public class UserService {
     }
 
     // public List<User> getUsersByEmail(String email) {
-    //     return this.userRepository.findByEmail(email);
+    // return this.userRepository.findByEmail(email);
     // }
 
     public Optional<User> getUserById(long id) {
@@ -57,11 +59,21 @@ public class UserService {
         return user;
     }
 
-    public boolean checkEmailExist(String email){
+    public boolean checkEmailExist(String email) {
         return this.userRepository.existsByEmail(email);
     }
 
-    public User getUserByEmail(String email){
+    public User getUserByEmail(String email) {
         return this.userRepository.findByEmail(email);
+    }
+
+
+    public long countUsers() {
+        return this.userRepository.count();
+    }
+
+
+    public Page<User> getAllUsers(Pageable pageable){
+        return this.userRepository.findAll(pageable);
     }
 }

@@ -1,7 +1,11 @@
 package com.example.laptopshop.controller.admin;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-
 @Controller
 public class ProductController {
 
@@ -33,9 +36,22 @@ public class ProductController {
     }
 
     @GetMapping("/admin/product")
-    public String getProductPage(Model model) {
-        List<Product> products = this.productService.getAllProduct();
-        model.addAttribute("products", products);
+    public String getProductPage(Model model,
+            @RequestParam("page") Optional<String> pageOptional) {
+        int page = 1;
+        try {
+            if (pageOptional.isPresent()){
+                page = Integer.parseInt(pageOptional.get());
+            }else{}
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, 4);
+        Page<Product> products = this.productService.getAllProduct(pageable);
+        model.addAttribute("products", products.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", products.getTotalPages());
         return "admin/product/show";
     }
 
@@ -72,7 +88,6 @@ public class ProductController {
         model.addAttribute("product", product);
         return "admin/product/detail";
     }
-    
 
     @GetMapping("/admin/product/update/{id}")
     public String getUpdateProductPage(Model model, @PathVariable long id) {
@@ -80,22 +95,22 @@ public class ProductController {
         model.addAttribute("newProduct", currenProduct);
         return "admin/product/update";
     }
-    
+
     @PostMapping("/admin/product/update")
-    public String updateProductPage(Model model, 
+    public String updateProductPage(Model model,
             @ModelAttribute("newProduct") @Valid Product product,
             BindingResult newProducBindingResult,
             @RequestParam("file") MultipartFile file) {
         Product currentProduct = this.productService.getProductById(product.getId()).get();
-        
-        if(newProducBindingResult.hasErrors()){
+
+        if (newProducBindingResult.hasErrors()) {
             return "admin/product/update";
         }
-        if (!file.isEmpty()){
+        if (!file.isEmpty()) {
             String img = this.uploadService.handleSaveUploadFile(file, "product");
             currentProduct.setImage(img);
         }
-        if (currentProduct != null){
+        if (currentProduct != null) {
             currentProduct.setName(product.getName());
             currentProduct.setPrice(product.getPrice());
             currentProduct.setDetailDesc(product.getDetailDesc());
@@ -108,7 +123,6 @@ public class ProductController {
         return "redirect:/admin/product";
     }
 
-
     @GetMapping("/admin/product/delete/{id}")
     public String getDeleteProductPage(Model model, @PathVariable long id) {
         Product product = this.productService.getProductById(id).get();
@@ -116,11 +130,11 @@ public class ProductController {
 
         return "admin/product/delete";
     }
-    
+
     @PostMapping("/admin/product/delete")
     public String deleteProductPage(Model model, @ModelAttribute("product") Product product) {
         this.productService.deleteAProduct(product.getId());
         return "redirect:/admin/product";
     }
-    
+
 }

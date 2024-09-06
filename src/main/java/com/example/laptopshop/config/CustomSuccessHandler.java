@@ -50,20 +50,27 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         if (session == null) {
             return;
         }
-        
+
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
         // Get email
         String email = authentication.getName();
 
         // Query user
         User currentUser = this.userService.getUserByEmail(email);
-        if (currentUser != null){
+        if (currentUser != null) {
             session.setAttribute("fullName", currentUser.getFullName());
             session.setAttribute("avatar", currentUser.getAvatar());
             session.setAttribute("id", currentUser.getId());
             session.setAttribute("email", currentUser.getEmail());
+
+            try {
+                int sum = currentUser.getCart().getSum();
+                session.setAttribute("sum", sum);
+            } catch (Exception e) {
+                session.setAttribute("sum", 0);
+            }
+
         }
-        
     }
 
     @Override

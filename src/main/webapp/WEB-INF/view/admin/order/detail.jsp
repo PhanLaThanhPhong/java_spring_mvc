@@ -23,81 +23,58 @@
                         <div id="layoutSidenav_content">
                             <main>
                                 <div class="container-fluid px-4">
-                                    <h1 class="mt-4">Manager Products</h1>
+                                    <h1 class="mt-4">Manager Order Details</h1>
                                     <ol class="breadcrumb mb-4">
                                         <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-                                        <li class="breadcrumb-item active">Products</li>
+                                        <li class="breadcrumb-item"><a href="/admin/order">Order</a></li>
+                                        <li class="breadcrumb-item active">Order Details</li>
                                     </ol>
                                     <div class="container mt-5">
                                         <div class="row">
                                             <div class="col-12 mx-auto">
                                                 <div class="d-flex justify-content-between">
-                                                    <h3>Table Product</h3>
-                                                    <a href="/admin/product/create" class="btn btn-primary">CREATE A
-                                                        PRODUCT</a>
+                                                    <h3>Table Order Details</h3>
+
                                                 </div>
                                                 <hr />
                                                 <table class="table table-bordered table-hover">
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
-                                                            <th>Name</th>
+                                                            <th>Product Name</th>
                                                             <th>Price</th>
-                                                            <th>Factory</th>
-                                                            <th>Action</th>
+                                                            <th>Quantity</th>
+                                                            <th>Image</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <c:forEach var="product" items="${products}">
+                                                        <c:forEach var="orderDetail" items="${orderDetails}">
                                                             <tr>
-                                                                <td>${product.id}</td>
-                                                                <td>${product.name}</td>
+                                                                <td>${orderDetail.id}</td>
+                                                                <td>${orderDetail.product.name}</td>
                                                                 <td>
                                                                     <fmt:formatNumber type="number"
-                                                                        value="${product.price}" /> đ
+                                                                        value="${orderDetail.price}" /> đ
                                                                 </td>
-                                                                <td>${product.factory}</td>
+                                                                <td>${orderDetail.quantity}</td>
                                                                 <td>
-                                                                    <div>
-                                                                        <a href="/admin/product/${product.id}"
-                                                                            class="btn btn-success">View</a>
-                                                                        <a href="/admin/product/update/${product.id}"
-                                                                            class="btn btn-warning mx-2">Update</a>
-                                                                        <a href="/admin/product/delete/${product.id}"
-                                                                            class="btn btn-danger">Delete</a>
-                                                                    </div>
+                                                                    <a href="/admin/product/${orderDetail.product.id}">
+                                                                        <img src="/images/product/${orderDetail.product.image}"
+                                                                            alt="Product Avatar"
+                                                                            style="width: 50%; height: 150px;">
+                                                                    </a>
                                                                 </td>
+
                                                             </tr>
+
                                                         </c:forEach>
 
                                                     </tbody>
                                                 </table>
-                                                <nav aria-label="Page navigation example">
-                                                    <ul class="pagination justify-content-center">
-                                                        <li class="page-item">
-                                                            <a class="page-link ${(1 eq currentPage) ? 'disabled':'' }" href="?page=${currentPage - 1}" aria-label="Previous">
-                                                                <span aria-hidden="true">&laquo;</span>
-                                                            </a>
-                                                        </li>
-
-                                                        <c:forEach begin="1" end="${totalPages}" varStatus="loop">
-                                                            <li class="page-item"><a class="page-link ${loop.index eq currentPage?'active':''}"
-                                                                    href="?page=${loop.index}">${loop.index}</a>
-                                                            </li>
-                                                        </c:forEach>
-
-                                                        </li>
-                                                        <li class="page-item">
-                                                            <a class="page-link ${(totalPages eq currentPage) ? 'disabled':'' }" href="?page=${currentPage + 1}" href="#" aria-label="Next">
-                                                                <span aria-hidden="true">&raquo;</span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </nav>
                                             </div>
 
                                         </div>
-
+                                        <a href="/admin/order" class="btn btn-success">Back</a>
                                     </div>
                                 </div>
                             </main>

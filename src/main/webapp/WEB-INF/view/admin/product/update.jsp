@@ -8,7 +8,7 @@
                 <meta charset="utf-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-                <title>Dashboard Users</title>
+                <title>Dashboard Products</title>
                 <link href="/css/styles.css" rel="stylesheet" />
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
                 <script>
@@ -41,7 +41,8 @@
                                 <h1 class="mt-4">Manager Products</h1>
                                 <ol class="breadcrumb mb-4">
                                     <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-                                    <li class="breadcrumb-item active">Products</li>
+                                    <li class="breadcrumb-item"><a href="/admin/product">Products</a></li>
+                                    <li class="breadcrumb-item active">Update Product</li>
                                 </ol>
                                 <div class="mt-5">
                                     <div class="row">
@@ -51,7 +52,7 @@
                                             <form:form method="post" action="/admin/product/update"
                                                 modelAttribute="newProduct" class="row" enctype="multipart/form-data">
                                                 <div class="mb-3 col-12 col-md-6" style="display: none;">
-                                                    <label class="form-label">Name:</label>
+                                                    <label class="form-label">Id:</label>
                                                     <form:input type="text"
                                                         class="form-control ${not empty nameHasBindError?'is-invalid':''}"
                                                         path="id" />
@@ -143,7 +144,7 @@
                                                 </div>
                                                 <div class="col-12 mb-5">
                                                     <a href="/admin/product" class="btn btn-success">Back</a>
-                                                    <button type="submit" class="btn btn-primary">Create</button>
+                                                    <button type="submit" class="btn btn-warning">Update</button>
                                                 </div>
                                             </form:form>
 
