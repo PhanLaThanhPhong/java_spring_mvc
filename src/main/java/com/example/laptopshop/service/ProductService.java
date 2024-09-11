@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.laptopshop.domain.Cart;
@@ -12,14 +13,16 @@ import com.example.laptopshop.domain.CartDetail;
 import com.example.laptopshop.domain.Order;
 import com.example.laptopshop.domain.OrderDetail;
 import com.example.laptopshop.domain.Product;
+import com.example.laptopshop.domain.Product_;
 import com.example.laptopshop.domain.User;
+import com.example.laptopshop.domain.dto.ProductCriteriaDTO;
 import com.example.laptopshop.repository.CartDetailRepository;
 import com.example.laptopshop.repository.CartRepository;
 import com.example.laptopshop.repository.OrderDetailRepository;
 import com.example.laptopshop.repository.OrderRepository;
 import com.example.laptopshop.repository.ProductRepository;
+import com.example.laptopshop.service.specification.ProductSpecs;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 @Service
@@ -47,12 +50,65 @@ public class ProductService {
         return this.productRepository.save(product);
     }
 
-    public List<Product> getAllProduct(){
+    public List<Product> getAllProduct() {
         return this.productRepository.findAll();
     }
 
     public Page<Product> getAllProduct(Pageable pageable) {
         return this.productRepository.findAll(pageable);
+    }
+
+    public Page<Product> getAllProductWithSpecs(Pageable pageable, ProductCriteriaDTO productCriteriaDTO){
+        Specification<Product> combinedSpecs = Specification.where(null);
+        if (productCriteriaDTO.getFactory() != null && productCriteriaDTO.getFactory().isPresent()) {
+            Specification<Product> currentSpecs = ProductSpecs.factoryName(productCriteriaDTO.getFactory().get());
+            combinedSpecs = combinedSpecs.and(currentSpecs);
+        }
+        if (productCriteriaDTO.getTarget() != null && productCriteriaDTO.getTarget().isPresent()){
+            Specification<Product> currentSpecs = ProductSpecs.targetName(productCriteriaDTO.getTarget().get());
+            combinedSpecs = combinedSpecs.and(currentSpecs);
+        }
+        if (productCriteriaDTO.getPrice() != null && productCriteriaDTO.getPrice().isPresent()){
+            Specification<Product> currentSpecs = this.buildPriceSpecification(productCriteriaDTO.getPrice().get());
+            combinedSpecs = combinedSpecs.and(currentSpecs);
+        }
+        return this.productRepository.findAll(combinedSpecs, pageable);
+    }
+
+    public Specification<Product> buildPriceSpecification(List<String> price) {
+        Specification<Product> combinedSpecs = (root, query, criteriaBuilder) -> criteriaBuilder.disjunction();
+        double min = 0;
+        double max = 0;
+        for (String p : price) {
+            switch (p) {
+                case "duoi-10-trieu":
+                    min = 0;
+                    max = 10000000;
+                    break;
+                case "10-15-trieu":
+                    min = 10000000;
+                    max = 15000000;
+                    break;
+
+                case "15-20-trieu":
+                    min = 15000000;
+                    max = 20000000;
+                    break;
+
+                case "tren-20-trieu":
+                    min = 20000000;
+                    max = Double.MAX_VALUE;
+                    break;
+
+                default:
+                    break;
+            }
+            if (min != 0 && max != 0){
+                Specification<Product> rangeSpecs = ProductSpecs.rangePrice(min, max);
+                combinedSpecs = combinedSpecs.or(rangeSpecs);
+            }
+        }
+        return combinedSpecs;
     }
 
     public Optional<Product> getProductById(long id) {
@@ -152,7 +208,6 @@ public class ProductService {
 
         order = this.orderRepository.save(order);
 
-        
         // Get cart by user
         Cart cart = user.getCart();
 
@@ -171,7 +226,7 @@ public class ProductService {
             }
 
             // Step 2: Delete cart va cartDetail
-            for (CartDetail cd : cart.getCartDetails()){
+            for (CartDetail cd : cart.getCartDetails()) {
                 this.cartDetailRepository.delete(cd);
             }
             this.cartRepository.delete(cart);
@@ -181,8 +236,7 @@ public class ProductService {
         }
     }
 
-
-    public long countProducts(){
+    public long countProducts() {
         return this.productRepository.count();
     }
 }

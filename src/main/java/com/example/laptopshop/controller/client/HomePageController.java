@@ -1,6 +1,5 @@
 package com.example.laptopshop.controller.client;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import com.example.laptopshop.domain.Cart;
 import com.example.laptopshop.domain.Order;
 import com.example.laptopshop.domain.Product;
 import com.example.laptopshop.domain.User;
