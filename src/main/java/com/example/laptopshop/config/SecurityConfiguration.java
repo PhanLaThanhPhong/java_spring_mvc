@@ -66,7 +66,7 @@ public class SecurityConfiguration {
                         .permitAll()
 
                         .requestMatchers("/", "/login", "/register", "/product/**", "/client/**", "/css/**", "/js/**",
-                                "/images/**")
+                                "/images/**", "/products/**")
                         .permitAll()
 
                         // Ham hasRole se tu dong bo tien to ROLE_ trong ROLE_ADMIN

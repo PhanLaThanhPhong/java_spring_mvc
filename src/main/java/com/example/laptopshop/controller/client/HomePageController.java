@@ -54,7 +54,7 @@ public class HomePageController {
         } catch (Exception e) {
             // TODO: handle exception
         }
-        Pageable pageable = PageRequest.of(page - 1, 4);
+        Pageable pageable = PageRequest.of(page - 1, 8);
         Page<Product> products = this.productService.getAllProduct(pageable);
 
         model.addAttribute("products", products.getContent());

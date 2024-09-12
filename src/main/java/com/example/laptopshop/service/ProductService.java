@@ -13,7 +13,6 @@ import com.example.laptopshop.domain.CartDetail;
 import com.example.laptopshop.domain.Order;
 import com.example.laptopshop.domain.OrderDetail;
 import com.example.laptopshop.domain.Product;
-import com.example.laptopshop.domain.Product_;
 import com.example.laptopshop.domain.User;
 import com.example.laptopshop.domain.dto.ProductCriteriaDTO;
 import com.example.laptopshop.repository.CartDetailRepository;
@@ -82,7 +81,7 @@ public class ProductService {
         for (String p : price) {
             switch (p) {
                 case "duoi-10-trieu":
-                    min = 0;
+                    min = 1;
                     max = 10000000;
                     break;
                 case "10-15-trieu":
